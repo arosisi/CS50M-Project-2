@@ -20,7 +20,7 @@ and view additional information about any movies they select. Check out the
 The aesthetics of the app are up to you!
 
 ### Challenge (Not Required)
-- Coming soon!
+- Add a settings screen (accessed via a tab navigator) that allows you to configure your results from the API
 
 ## Getting Started
 First, head to [this link](https://docs.expo.io/versions/latest/get-started/installation/)
