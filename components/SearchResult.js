@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
     flex: 1
   },
   title: {
-    flexWrap: "wrap",
     fontWeight: "bold"
   }
 });
@@ -46,9 +45,12 @@ export default class SearchResult extends React.Component {
             source={{ uri: result.Poster }}
           />
           <View style={styles.texts}>
-            <Text style={styles.title}>{`${result.Title}`}</Text>
-            <Text>{`Year: ${result.Year}`}</Text>
-            <Text>{`IMDB ID: ${result.imdbID}`}</Text>
+            <Text>
+              <Text style={styles.title}>{result.Title}</Text>
+              <Text> ({result.Year})</Text>
+            </Text>
+            <Text>Type: {result.Type}</Text>
+            <Text>imdbID: {result.imdbID}</Text>
           </View>
         </TouchableOpacity>
       )

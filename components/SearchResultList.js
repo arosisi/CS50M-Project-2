@@ -19,7 +19,14 @@ export default class SearchResultList extends React.Component {
   shouldDisableNextButton = () => this.props.page * 10 >= this.props.total;
 
   render() {
-    const { total, page, results, onSelectResult } = this.props;
+    const {
+      total,
+      page,
+      results,
+      onPrevButtonClick,
+      onNextButtonClick,
+      onSelectResult
+    } = this.props;
     return (
       <ScrollView>
         {results[page].map(result => (
@@ -32,9 +39,19 @@ export default class SearchResultList extends React.Component {
 
         {!!total && (
           <View style={styles.buttons}>
-            <Button title='Prev' disabled={this.shouldDisablePrevButton()} />
-            <Text>{page}</Text>
-            <Button title='Next' disabled={this.shouldDisableNextButton()} />
+            <Button
+              title='Prev'
+              disabled={this.shouldDisablePrevButton()}
+              onPress={onPrevButtonClick}
+            />
+            <Text>
+              {page} / {Math.ceil(total / 10)}
+            </Text>
+            <Button
+              title='Next'
+              disabled={this.shouldDisableNextButton()}
+              onPress={onNextButtonClick}
+            />
           </View>
         )}
       </ScrollView>
@@ -46,5 +63,7 @@ SearchResultList.propTypes = {
   total: PropTypes.number.isRequired,
   page: PropTypes.number.isRequired,
   results: PropTypes.object.isRequired,
+  onPrevButtonClick: PropTypes.func.isRequired,
+  onNextButtonClick: PropTypes.func.isRequired,
   onSelectResult: PropTypes.func.isRequired
 };

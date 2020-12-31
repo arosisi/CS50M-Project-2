@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet, ScrollView, View, Image, Text } from "react-native";
 
-import SettingsContext from "../context/SettingsContext";
+import SettingsContext from "../contexts/SettingsContext";
 import Rating from "../components/Rating";
 
 import { MOVIE_INFOS } from "../constants";
-import { movie } from "../mockData";
+import apiKeys from "../api-keys";
 
 const styles = StyleSheet.create({
   container: {
@@ -33,8 +33,11 @@ const styles = StyleSheet.create({
 class MovieInfoScreen extends React.Component {
   state = { movie: null, posterWidth: null, posterHeight: null };
 
-  componentDidMount() {
-    // TODO: Get info with this.props.route.params.imdbID
+  async componentDidMount() {
+    const url = `http://www.omdbapi.com/?i=${this.props.route.params.imdbID}&apikey=${apiKeys.OMDb}`;
+    const response = await fetch(url);
+    const movie = await response.json();
+
     this.setState({ movie }, () =>
       Image.getSize(this.state.movie.Poster, (w, h) =>
         this.setState({ posterWidth: w, posterHeight: h })
@@ -57,24 +60,24 @@ class MovieInfoScreen extends React.Component {
 
           <Text style={styles.textMargin}>
             <Text style={styles.textHighlight}>{movie.Title}</Text>
-            <Text>{` (${movie.Year})`}</Text>
+            <Text> ({movie.Year})</Text>
           </Text>
 
           <Text style={styles.textMargin}>{movie.Plot}</Text>
 
           <Text>
             <Text style={styles.textHighlight}>Directors:</Text>
-            <Text>{` ${movie.Director}`}</Text>
+            <Text> {movie.Director}</Text>
           </Text>
 
           <Text>
             <Text style={styles.textHighlight}>Writers:</Text>
-            <Text>{` ${movie.Writer}`}</Text>
+            <Text> {movie.Writer}</Text>
           </Text>
 
           <Text>
             <Text style={styles.textHighlight}>Actors:</Text>
-            <Text>{` ${movie.Actors}`}</Text>
+            <Text> {movie.Actors}</Text>
           </Text>
 
           {Object.keys(context.infos)
@@ -86,7 +89,7 @@ class MovieInfoScreen extends React.Component {
             .map(info => (
               <Text key={info}>
                 <Text style={styles.textHighlight}>{info}:</Text>
-                <Text>{` ${movie[info]}`}</Text>
+                <Text> {movie[info] || "N/A"}</Text>
               </Text>
             ))}
 

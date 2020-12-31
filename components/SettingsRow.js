@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, Text } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import PropTypes from "prop-types";
 
-import SettingsContext from "../context/SettingsContext";
+import SettingsContext from "../contexts/SettingsContext";
 
 const styles = StyleSheet.create({
   container: {

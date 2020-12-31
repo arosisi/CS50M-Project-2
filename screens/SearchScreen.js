@@ -1,14 +1,19 @@
 import React from "react";
-import { StyleSheet, View, TextInput, Button } from "react-native";
+import { StyleSheet, View, Text, TextInput, Button } from "react-native";
 
 import SearchResultList from "../components/SearchResultList";
 
-import { search } from "../mockData";
+import apiKeys from "../api-keys";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white"
+  },
+  error: {
+    paddingTop: 10,
+    paddingHorizontal: 15,
+    color: "tomato"
   },
   input: {
     height: 50,
@@ -22,30 +27,96 @@ const styles = StyleSheet.create({
 
 export default class SearchScreen extends React.Component {
   state = {
-    searchText: "",
+    currentText: "" /* current text in the search bar */,
+    searchText: "" /* text used in search */,
     total: 0,
     page: 1,
-    results: { 1: [] }
+    results: { 1: [] },
+    error: null
   };
 
-  handleKeywordChange = searchText => this.setState({ searchText });
+  handleKeywordChange = currentText => this.setState({ currentText });
 
-  handleSearch = () => {
-    // TODO: Get search results with searchText
-    this.setState({ total: 3049, page: 1, results: { 1: search.Search } });
+  handleSearch = async () => {
+    const { currentText } = this.state;
+
+    if (!currentText) {
+      this.setState({
+        searchText: currentText,
+        total: 0,
+        page: 1,
+        results: { 1: [] },
+        error: null
+      });
+      return;
+    }
+
+    const url = `http://www.omdbapi.com/?s=${currentText}&apikey=${apiKeys.OMDb}`;
+    const response = await fetch(url);
+    const json = await response.json();
+
+    if (json.Response === "False") {
+      this.setState({
+        searchText: currentText,
+        total: 0,
+        page: 1,
+        results: { 1: [] },
+        error: json.Error
+      });
+    } else {
+      this.setState({
+        searchText: currentText,
+        total: parseInt(json.totalResults),
+        page: 1,
+        results: { 1: json.Search },
+        error: null
+      });
+    }
+  };
+
+  handlePrevSearch = () => this.setState({ page: this.state.page - 1 });
+
+  handleNextSearch = async () => {
+    const { searchText, page, results } = this.state;
+
+    if (results[page + 1]) {
+      this.setState({ page: page + 1 });
+      return;
+    }
+
+    // prettier-ignore
+    const url = `http://www.omdbapi.com/?s=${searchText}&page=${page + 1}&apikey=${apiKeys.OMDb}`;
+    const response = await fetch(url);
+    const json = await response.json();
+
+    if (json.Response === "False") {
+      this.setState({
+        total: 0,
+        page: 1,
+        results: { 1: [] },
+        error: json.Error
+      });
+    } else {
+      this.setState({
+        total: parseInt(json.totalResults),
+        page: page + 1,
+        results: { ...results, [page + 1]: json.Search },
+        error: null
+      });
+    }
   };
 
   handleSelectResult = result =>
     this.props.navigation.navigate("MovieInfo", result);
 
   render() {
-    const { searchText, total, page, results } = this.state;
+    const { currentText, total, page, results, error } = this.state;
     return (
       <View style={styles.container}>
         <TextInput
           style={styles.input}
           placeholder='Search by title...'
-          value={searchText}
+          value={currentText}
           onChangeText={this.handleKeywordChange}
         />
 
@@ -53,12 +124,18 @@ export default class SearchScreen extends React.Component {
           <Button title='Search' onPress={this.handleSearch} />
         </View>
 
-        <SearchResultList
-          total={total}
-          page={page}
-          results={results}
-          onSelectResult={this.handleSelectResult}
-        />
+        {error ? (
+          <Text style={styles.error}>{error}</Text>
+        ) : (
+          <SearchResultList
+            total={total}
+            page={page}
+            results={results}
+            onPrevButtonClick={this.handlePrevSearch}
+            onNextButtonClick={this.handleNextSearch}
+            onSelectResult={this.handleSelectResult}
+          />
+        )}
       </View>
     );
   }

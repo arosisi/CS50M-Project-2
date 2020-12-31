@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-import SettingsProvider from "./context/SettingsProvider";
+import SettingsProvider from "./contexts/SettingsProvider";
 import HomeTab from "./tabs/HomeTab";
 import SettingsTab from "./tabs/SettingsTab";
 

@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, TouchableOpacity, Text } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 
-import SettingsContext from "../context/SettingsContext";
+import SettingsContext from "../contexts/SettingsContext";
 
 const styles = StyleSheet.create({
   container: {
@@ -10,10 +10,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 3,
-    backgroundColor: "ghostwhite",
-    borderColor: "gainsboro",
-    borderWidth: 1,
-    borderRadius: 2
+    backgroundColor: "honeydew"
   },
   text: {
     fontWeight: "bold"
@@ -34,9 +31,7 @@ class SettingsAllRow extends React.Component {
     return (
       <TouchableOpacity style={styles.container} onPress={this.toggleCheckBox}>
         <CheckBox value={checked} onValueChange={this.toggleCheckBox} />
-        <Text style={styles.text}>
-          {`${checked ? "Deselect" : "Select"} all`}
-        </Text>
+        <Text style={styles.text}>{checked ? "Deselect" : "Select"} all</Text>
       </TouchableOpacity>
     );
   }
