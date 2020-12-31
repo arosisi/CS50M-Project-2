@@ -13,6 +13,11 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 10
   },
+  error: {
+    paddingTop: 10,
+    paddingHorizontal: 15,
+    color: "tomato"
+  },
   image: {
     width: "100%",
     borderRadius: 5,
@@ -31,27 +36,36 @@ const styles = StyleSheet.create({
 });
 
 class MovieInfoScreen extends React.Component {
-  state = { movie: null, posterWidth: null, posterHeight: null };
+  state = { movie: null, posterWidth: null, posterHeight: null, error: null };
 
   async componentDidMount() {
-    const url = `http://www.omdbapi.com/?i=${this.props.route.params.imdbID}&apikey=${apiKeys.OMDb}`;
-    const response = await fetch(url);
-    const movie = await response.json();
+    try {
+      const url = `http://www.omdbapi.com/?i=${this.props.route.params.imdbID}&apikey=${apiKeys.OMDb}`;
+      const response = await fetch(url);
+      const json = await response.json();
 
-    this.setState({ movie }, () =>
-      Image.getSize(this.state.movie.Poster, (w, h) =>
-        this.setState({ posterWidth: w, posterHeight: h })
-      )
-    );
+      if (json.Response === "False") {
+        this.setState({ error: json.Error });
+      } else {
+        this.setState({ movie: json, error: null }, () =>
+          Image.getSize(this.state.movie.Poster, (w, h) =>
+            this.setState({ posterWidth: w, posterHeight: h })
+          )
+        );
+      }
+    } catch (error) {
+      this.setState({ error: error.message });
+    }
   }
 
   render() {
     const { context } = this.props;
-    const { movie, posterWidth, posterHeight } = this.state;
-    return (
-      movie &&
-      posterWidth &&
-      posterHeight && (
+    const { movie, posterWidth, posterHeight, error } = this.state;
+    const isReady = movie && posterWidth && posterHeight;
+    return error ? (
+      <Text style={styles.error}>{error}</Text>
+    ) : (
+      isReady && (
         <ScrollView style={styles.container}>
           <Image
             style={{ ...styles.image, aspectRatio: posterWidth / posterHeight }}

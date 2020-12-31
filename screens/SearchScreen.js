@@ -51,26 +51,24 @@ export default class SearchScreen extends React.Component {
       return;
     }
 
-    const url = `http://www.omdbapi.com/?s=${currentText}&apikey=${apiKeys.OMDb}`;
-    const response = await fetch(url);
-    const json = await response.json();
+    try {
+      const url = `http://www.omdbapi.com/?s=${currentText}&apikey=${apiKeys.OMDb}`;
+      const response = await fetch(url);
+      const json = await response.json();
 
-    if (json.Response === "False") {
-      this.setState({
-        searchText: currentText,
-        total: 0,
-        page: 1,
-        results: { 1: [] },
-        error: json.Error
-      });
-    } else {
-      this.setState({
-        searchText: currentText,
-        total: parseInt(json.totalResults),
-        page: 1,
-        results: { 1: json.Search },
-        error: null
-      });
+      if (json.Response === "False") {
+        this.handleSearchError(currentText, json.Error);
+      } else {
+        this.setState({
+          searchText: currentText,
+          total: parseInt(json.totalResults),
+          page: 1,
+          results: { 1: json.Search },
+          error: null
+        });
+      }
+    } catch (error) {
+      this.handleSearchError(currentText, error.message);
     }
   };
 
@@ -84,27 +82,35 @@ export default class SearchScreen extends React.Component {
       return;
     }
 
-    // prettier-ignore
-    const url = `http://www.omdbapi.com/?s=${searchText}&page=${page + 1}&apikey=${apiKeys.OMDb}`;
-    const response = await fetch(url);
-    const json = await response.json();
+    try {
+      // prettier-ignore
+      const url = `http://www.omdbapi.com/?s=${searchText}&page=${page + 1}&apikey=${apiKeys.OMDb}`;
+      const response = await fetch(url);
+      const json = await response.json();
 
-    if (json.Response === "False") {
-      this.setState({
-        total: 0,
-        page: 1,
-        results: { 1: [] },
-        error: json.Error
-      });
-    } else {
-      this.setState({
-        total: parseInt(json.totalResults),
-        page: page + 1,
-        results: { ...results, [page + 1]: json.Search },
-        error: null
-      });
+      if (json.Response === "False") {
+        this.handleSearchError(searchText, json.Error);
+      } else {
+        this.setState({
+          total: parseInt(json.totalResults),
+          page: page + 1,
+          results: { ...results, [page + 1]: json.Search },
+          error: null
+        });
+      }
+    } catch (error) {
+      this.handleSearchError(searchText, error.message);
     }
   };
+
+  handleSearchError = (searchText, error) =>
+    this.setState({
+      searchText,
+      total: 0,
+      page: 1,
+      results: { 1: [] },
+      error
+    });
 
   handleSelectResult = result =>
     this.props.navigation.navigate("MovieInfo", result);
