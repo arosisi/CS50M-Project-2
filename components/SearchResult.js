@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 100,
+    height: "auto",
     borderRadius: 5,
     marginRight: 10
   },
@@ -30,30 +31,52 @@ export default class SearchResult extends React.Component {
     );
   }
 
+  renderPoster = () => {
+    const { posterWidth, posterHeight } = this.state;
+    return (
+      <Image
+        style={{
+          ...styles.image,
+          aspectRatio: posterWidth / posterHeight
+        }}
+        source={{ uri: this.props.result.Poster }}
+      />
+    );
+  };
+
+  renderNotFoundImage = () => {
+    const notFoundImage = require("../assets/image-not-found.png");
+    const { width, height } = Image.resolveAssetSource(notFoundImage);
+    return (
+      <Image
+        style={{
+          ...styles.image,
+          aspectRatio: width / height
+        }}
+        source={notFoundImage}
+      />
+    );
+  };
+
   render() {
     const { result, onSelectResult } = this.props;
     const { posterWidth, posterHeight } = this.state;
+    const isReady = posterWidth && posterHeight;
     return (
-      posterWidth &&
-      posterHeight && (
-        <TouchableOpacity
-          style={styles.container}
-          onPress={() => onSelectResult(result)}
-        >
-          <Image
-            style={{ ...styles.image, aspectRatio: posterWidth / posterHeight }}
-            source={{ uri: result.Poster }}
-          />
-          <View style={styles.texts}>
-            <Text>
-              <Text style={styles.title}>{result.Title}</Text>
-              <Text> ({result.Year})</Text>
-            </Text>
-            <Text>Type: {result.Type}</Text>
-            <Text>imdbID: {result.imdbID}</Text>
-          </View>
-        </TouchableOpacity>
-      )
+      <TouchableOpacity
+        style={styles.container}
+        onPress={() => onSelectResult(result)}
+      >
+        {isReady ? this.renderPoster() : this.renderNotFoundImage()}
+        <View style={styles.texts}>
+          <Text>
+            <Text style={styles.title}>{result.Title}</Text>
+            <Text> ({result.Year})</Text>
+          </Text>
+          <Text>Type: {result.Type}</Text>
+          <Text>imdbID: {result.imdbID}</Text>
+        </View>
+      </TouchableOpacity>
     );
   }
 }

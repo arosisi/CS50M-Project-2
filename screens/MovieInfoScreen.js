@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
+    height: "auto",
     borderRadius: 5,
     marginVertical: 10
   },
@@ -58,6 +59,33 @@ class MovieInfoScreen extends React.Component {
     }
   }
 
+  renderPoster = () => {
+    const { movie, posterWidth, posterHeight } = this.state;
+    return (
+      <Image
+        style={{
+          ...styles.image,
+          aspectRatio: posterWidth / posterHeight
+        }}
+        source={{ uri: movie.Poster }}
+      />
+    );
+  };
+
+  renderNotFoundImage = () => {
+    const notFoundImage = require("../assets/image-not-found.png");
+    const { width, height } = Image.resolveAssetSource(notFoundImage);
+    return (
+      <Image
+        style={{
+          ...styles.image,
+          aspectRatio: width / height
+        }}
+        source={notFoundImage}
+      />
+    );
+  };
+
   render() {
     const { context } = this.props;
     const { movie, posterWidth, posterHeight, error } = this.state;
@@ -65,12 +93,9 @@ class MovieInfoScreen extends React.Component {
     return error ? (
       <Text style={styles.error}>{error}</Text>
     ) : (
-      isReady && (
+      movie && (
         <ScrollView style={styles.container}>
-          <Image
-            style={{ ...styles.image, aspectRatio: posterWidth / posterHeight }}
-            source={{ uri: movie.Poster }}
-          />
+          {isReady ? this.renderPoster() : this.renderNotFoundImage()}
 
           <Text style={styles.textMargin}>
             <Text style={styles.textHighlight}>{movie.Title}</Text>

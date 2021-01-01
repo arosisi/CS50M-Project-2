@@ -10,10 +10,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingHorizontal: 15,
-    paddingTop: 15
+    paddingHorizontal: 15
   },
   text: {
+    marginTop: 15,
     marginBottom: 5
   }
 });
