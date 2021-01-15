@@ -121,6 +121,7 @@ export default class SearchScreen extends React.Component {
       <View style={styles.container}>
         <TextInput
           style={styles.input}
+          autoCapitalize='none'
           placeholder='Search by title...'
           value={currentText}
           onChangeText={this.handleKeywordChange}
